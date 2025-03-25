@@ -1,0 +1,7 @@
+streamlit==1.29.0
+web3==6.15.1
+python-dotenv==1.0.0
+pandas==2.1.4
+plotly==5.18.0
+pypfopt==1.5.5
+requests==2.31.0
