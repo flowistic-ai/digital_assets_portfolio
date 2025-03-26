@@ -3,5 +3,7 @@ web3==6.15.1
 python-dotenv==1.0.0
 pandas==2.1.4
 plotly==5.18.0
-pypfopt==1.5.5
+pypfopt==1.6.0  # Updated version
 requests==2.31.0
+numpy==1.26.4    # Explicitly add numpy dependency
+cvxpy==1.3.3     # Required by pypfopt
