@@ -5,3 +5,4 @@ pandas
 plotly
 PyPortfolioOpt
 requests
+scikit-learn
