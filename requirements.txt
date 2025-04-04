@@ -6,3 +6,4 @@ plotly
 PyPortfolioOpt
 requests
 scikit-learn
+numpy
