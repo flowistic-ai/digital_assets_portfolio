@@ -7,5 +7,4 @@ PyPortfolioOpt
 requests
 scikit-learn
 numpy
-pypfopt
 cvxpy
