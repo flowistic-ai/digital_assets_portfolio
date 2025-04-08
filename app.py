@@ -391,11 +391,9 @@ st.title("🚀 Digital Asset Portfolio Optimizer & Predictor")
 st.markdown("Optimize your crypto portfolio based on historical data and explore simple momentum-based predictions.")
 st.warning(" This tool performs Mean-Variance Optimization (maximizing Quadratic Utility based on user risk aversion) using mean historical returns and Ledoit-Wolf shrunk covariance, subject to max weight and L2 constraints.")
 
-
 # --- Sidebar Controls ---
 with st.sidebar:
     st.header("⚙️ Portfolio Configuration")
-
     st.subheader("Initial Capital (EUR)")
     principal_eur = st.number_input("Enter your initial capital in EUR:", value=10000, step=1000, min_value=100)
 
@@ -485,12 +483,10 @@ with tab1:
                     st.session_state['opt_weights'] = weights
                     st.session_state['opt_performance'] = performance
                     st.success("✅ Optimization Complete!")
-
                     st.subheader("Optimized Portfolio Allocation (EUR)")
                     weights_df = pd.DataFrame.from_dict(weights, orient='index', columns=['Weight'])
                     weights_df['Value (EUR)'] = weights_df['Weight'] * principal_eur
                     st.dataframe(weights_df.style.format({'Weight': '{:.2%}', 'Value (EUR)': '€{:,.2f}'}))
-
                     ret, vol, sharpe = performance
                     st.subheader("Expected Portfolio Performance (Annualized, EUR)")
                     col1, col2, col3 = st.columns(3)
@@ -751,3 +747,4 @@ with tab3:
 # --- Footer ---
 st.markdown("---")
 st.caption("Developed using Streamlit, PyPortfolioOpt, Web3.py, Plotly, and CoinGecko/LiveCoinWatch APIs.")
+
