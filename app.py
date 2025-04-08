@@ -211,26 +211,28 @@ def get_live_prices(asset_symbols):
         "limit": 100, # Fetch top 100
         "meta": False
     }
-    try:
-        response = requests.post(url, json=payload, headers=headers, timeout=10)
-        if response.status_code != 200:
-            st.error(f"Failed to fetch live prices from LiveCoinWatch. Status: {response.status_code}, Response: {response.text}")
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(url, json=payload, headers=headers, timeout=20)
+            if response.status_code == 200:
+                data = response.json()
+                # Create a dictionary mapping symbol (code) to rate
+                live_rates = {coin['code']: coin['rate'] for coin in data if 'code' in coin and 'rate' in coin}
+
+                # Get prices for our specific assets, defaulting to 0 if not found
+                final_prices = {symbol: live_rates.get(symbol, 0) for symbol in asset_symbols}
+                return final_prices
+            else:
+                st.error(f"Failed to fetch live prices from LiveCoinWatch. Status: {response.status_code}, Response: {response.text}")
+                time.sleep(5 * (attempt + 1))  # Wait before retrying
+        except requests.exceptions.RequestException as e:
+            st.error(f"Network error fetching live prices: {e}")
+            time.sleep(5 * (attempt + 1))  # Wait before retrying
+        except Exception as e:
+            st.error(f"Error processing live prices: {e}")
             return {symbol: 0 for symbol in asset_symbols}
-
-        data = response.json()
-        # Create a dictionary mapping symbol (code) to rate
-        live_rates = {coin['code']: coin['rate'] for coin in data if 'code' in coin and 'rate' in coin}
-
-        # Get prices for our specific assets, defaulting to 0 if not found
-        final_prices = {symbol: live_rates.get(symbol, 0) for symbol in asset_symbols}
-        return final_prices
-
-    except requests.exceptions.RequestException as e:
-        st.error(f"Network error fetching live prices: {e}")
-        return {symbol: 0 for symbol in asset_symbols}
-    except Exception as e:
-        st.error(f"Error processing live prices: {e}")
-        return {symbol: 0 for symbol in asset_symbols}
+    return {symbol: 0 for symbol in asset_symbols}  # Return default if all retries fail
 
 # --- Portfolio Optimization Function ---
 
@@ -385,15 +387,13 @@ def predict_momentum(prices_df, lookback_days=30, projection_days=30):
 # --- Streamlit App Layout ---
 
 st.set_page_config(page_title="Digital Asset Portfolio Optimizer", layout="wide", initial_sidebar_state="expanded")
-st.title("?? Digital Asset Portfolio Optimizer & Predictor")
+st.title("🚀 Digital Asset Portfolio Optimizer & Predictor")
 st.markdown("Optimize your crypto portfolio based on historical data and explore simple momentum-based predictions.")
-st.warning("?? **Disclaimer:** This tool is for educational purposes only. Cryptocurrency investments are highly volatile. Past performance and simple predictions do not guarantee future results. Do your own research (DYOR) before investing.")
-
+st.warning(" This tool performs Mean-Variance Optimization (maximizing Quadratic Utility based on user risk aversion) using mean historical returns and Ledoit-Wolf shrunk covariance, subject to max weight and L2 constraints.")
 
 # --- Sidebar Controls ---
 with st.sidebar:
-    st.header("?? Portfolio Configuration")
-
+    st.header("⚙️ Portfolio Configuration")
     st.subheader("Initial Capital (EUR)")
     principal_eur = st.number_input("Enter your initial capital in EUR:", value=10000, step=1000, min_value=100)
 
@@ -430,7 +430,7 @@ with st.sidebar:
 
 
 # --- Main Area Tabs ---
-tab1, tab2, tab3 = st.tabs(["?? Optimize & Predict", "?? Visualizations", "?? Asset Data"])
+tab1, tab2, tab3 = st.tabs(["📈 Optimize & Predict", "📊 Visualizations", "ℹ️ Asset Data"])
 
 # --- Tab 1: Optimize & Predict ---
 with tab1:
@@ -470,7 +470,7 @@ with tab1:
             st.success("Historical price data loaded successfully.")
 
             # Optimization Button
-            if st.button("?? Run Optimization", key="run_opt"):
+            if st.button("🚀 Run Optimization", key="run_opt"):
                 with st.spinner("Optimizing portfolio..."):
                     weights, performance = optimize_portfolio(
                         prices_eur,
@@ -482,13 +482,11 @@ with tab1:
                 if weights and performance:
                     st.session_state['opt_weights'] = weights
                     st.session_state['opt_performance'] = performance
-                    st.success("? Optimization Complete!")
-
+                    st.success("✅ Optimization Complete!")
                     st.subheader("Optimized Portfolio Allocation (EUR)")
                     weights_df = pd.DataFrame.from_dict(weights, orient='index', columns=['Weight'])
                     weights_df['Value (EUR)'] = weights_df['Weight'] * principal_eur
-                    st.dataframe(weights_df.style.format({'Weight': '{:.2%}', 'Value (EUR)': 'Û{:,.2f}'}))
-
+                    st.dataframe(weights_df.style.format({'Weight': '{:.2%}', 'Value (EUR)': '€{:,.2f}'}))
                     ret, vol, sharpe = performance
                     st.subheader("Expected Portfolio Performance (Annualized, EUR)")
                     col1, col2, col3 = st.columns(3)
@@ -519,14 +517,14 @@ with tab1:
 
     # Prediction Button (only enable if optimization was successful)
     if 'opt_weights' in st.session_state and 'prices_usd' in st.session_state:
-        if st.button("?? Generate Prediction", key="run_pred"):
+        if st.button("🔮 Generate Prediction", key="run_pred"):
             with st.spinner("Calculating momentum and predicting..."):
                 prices_usd_hist = st.session_state['prices_usd']
                 predicted_prices_usd = predict_momentum(prices_usd_hist, pred_lookback, pred_projection)
 
             if not predicted_prices_usd.empty:
                 st.session_state['predicted_prices_usd'] = predicted_prices_usd
-                st.success(f"? Prediction generated for the next {pred_projection} days.")
+                st.success(f"✅ Prediction generated for the next {pred_projection} days.")
 
                 # Calculate predicted portfolio value
                 opt_w = st.session_state['opt_weights']
@@ -749,3 +747,4 @@ with tab3:
 # --- Footer ---
 st.markdown("---")
 st.caption("Developed using Streamlit, PyPortfolioOpt, Web3.py, Plotly, and CoinGecko/LiveCoinWatch APIs.")
+
