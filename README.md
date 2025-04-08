@@ -56,24 +56,10 @@ A Streamlit web application designed for sophisticated analysis and optimization
     ```
 
 4.  **Install dependencies:**
-    Create a `requirements.txt` file with the following content:
-    ```plaintext
-    streamlit
-    pandas
-    numpy
-    plotly
-    requests
-    python-dotenv
-    riskfolio-lib
-    scikit-learn
-    scipy
-    matplotlib
-    ```
-    Then install using pip (or uv):
     ```bash
     pip install -r requirements.txt
     # OR using uv:
-    # uv pip install -r requirements.txt
+    uv pip install -r requirements.txt
     ```
 
 ## Usage
@@ -82,4 +68,18 @@ Run the Streamlit application from your terminal:
 
 ```bash
 streamlit app.py
-Navigate to the local URL provided by Streamlit (usually http://localhost:8501) in your web browser.Core Libraries & Dependenciesstreamlit: Web application framework.riskfolio-lib: Core library for advanced portfolio optimization (HRP, Mean-CVaR, risk metrics, plotting).pandas, numpy: Data manipulation and numerical operations.plotly: Interactive data visualization.requests: Fetching data from APIs (CoinGecko, LiveCoinWatch).scikit-learn, scipy, matplotlib: Used for clustering, statistical functions, and specific plots (dendrogram).python-dotenv: Loading environment variables (API keys).License
+```
+
+Navigate to the local URL provided by Streamlit (usually http://localhost:8501) in your web browser.
+
+## Core Libraries & Dependencies:
+- streamlit: Web application framework.
+- riskfolio-lib: Core library for advanced portfolio optimization (HRP, Mean-CVaR, risk metrics, plotting)
+- pandas, numpy: Data manipulation and numerical operations
+- plotly: Interactive data visualization
+- requests: Fetching data from APIs (CoinGecko, LiveCoinWatch)
+- scikit-learn, scipy, matplotlib: Used for clustering, statistical functions, and specific plots (dendrogram)
+- python-dotenv: Loading environment variables (API keys)
+
+## License
+MIT License
